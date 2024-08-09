@@ -1,0 +1,12 @@
+/frontend/node_modules
+/frontend/dist
+/frontend/.idea
+
+/backend/venv
+*.pyc
+__pycache__
+/backend/.idea/*
+/backend/migrations/*
+
+.DS_Store
+.idea/
