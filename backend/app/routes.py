@@ -28,17 +28,9 @@ def add_product():
         name=data['name'],
         price=data['price'],
         discount_price=data.get('discount_price'),
-        guarantee=data['guarantee'],
-        rating=data['rating'],
-        count_review=data['count_review'],
-        is_available=data['is_available'],
-        store_address=data['store_address'],
-        color=data['color'],
         brand_id=data['brand_id'],
-        country_id=data['country_id'],
         category_id=data['category_id'],
-        created_at=data.get('created_at'),
-        updated_at=data.get('updated_at')
+        created_at=data.get('created_at')
     )
     db.session.add(product)
     db.session.commit()

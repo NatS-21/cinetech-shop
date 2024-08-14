@@ -19,7 +19,6 @@ class Brand(db.Model):
     __tablename__ = 'brands'
     brand_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text)
 
 
 class Category(db.Model):
@@ -29,47 +28,32 @@ class Category(db.Model):
     description = db.Column(db.Text)
 
 
-class Country(db.Model):
-    __tablename__ = 'countries'
-    country_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-
-
 class Product(db.Model):
     __tablename__ = 'products'
     product_id = db.Column(db.Integer, primary_key=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     discount_price = db.Column(db.Numeric(10, 2))
-    guarantee = db.Column(db.Integer)
     rating = db.Column(db.Numeric(2, 1))
-    count_review = db.Column(db.Integer)
-    is_available = db.Column(db.Boolean, default=True)
-    store_address = db.Column(db.Text)
-    color = db.Column(db.String(50))
     brand_id = db.Column(db.Integer, db.ForeignKey('brands.brand_id'))
-    country_id = db.Column(db.Integer, db.ForeignKey('countries.country_id'))
     category_id = db.Column(db.Integer, db.ForeignKey('categories.category_id'))
     name = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    image_url = db.Column(db.Text)
 
 
-class Image(db.Model):
-    __tablename__ = 'images'
-    image_id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.product_id'))
-    url = db.Column(db.Text, nullable=False)
-    alt_text = db.Column(db.Text)
+class CharacteristicTemplate(db.Model):
+    __tablename__ = 'characteristic_templates'
+    template_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    unit_type = db.Column(db.String(50))
 
 
-class Characteristic(db.Model):
-    __tablename__ = 'characteristics'
+class ProductCharacteristic(db.Model):
+    __tablename__ = 'product_characteristics'
     characteristic_id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.product_id'))
-    characteristic = db.Column(db.String(255), nullable=False)
-    unit_type = db.Column(db.String(50))
-    value = db.Column(db.String(255), nullable=False)
+    template_id = db.Column(db.Integer, db.ForeignKey('characteristic_templates.template_id'))
+    value = db.Column(db.Text, nullable=False)
 
 
 class Order(db.Model):
@@ -79,7 +63,6 @@ class Order(db.Model):
     total_amount = db.Column(db.Numeric(10, 2), nullable=False)
     status = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     shipping_address = db.Column(db.Text)
 
 
@@ -89,7 +72,6 @@ class OrderItem(db.Model):
     order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id'))
     product_id = db.Column(db.Integer, db.ForeignKey('products.product_id'))
     quantity = db.Column(db.Integer, nullable=False)
-    price = db.Column(db.Numeric(10, 2), nullable=False)
 
 
 class Cart(db.Model):
