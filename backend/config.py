@@ -17,6 +17,7 @@ class Config:
                               f"{config['database']['port']}/" \
                               f"{config['database']['database']}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'super-secret-key'
 
 
 def execute_sql_file(sql_file_path):
@@ -41,4 +42,3 @@ def execute_sql_file(sql_file_path):
     conn.close()
 
     print(f"SQL queries from {sql_file_path} have been executed successfully.")
-

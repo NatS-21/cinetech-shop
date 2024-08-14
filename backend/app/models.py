@@ -14,11 +14,29 @@ class User(db.Model):
     address = db.Column(db.Text)
     registration_date = db.Column(db.DateTime, default=datetime.utcnow)
 
+    def to_dict(self):
+        return {
+            'user_id': self.user_id,
+            'username': self.username,
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'phone_number': self.phone_number,
+            'address': self.address,
+            'registration_date': self.registration_date
+        }
+
 
 class Brand(db.Model):
     __tablename__ = 'brands'
     brand_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+
+    def to_dict(self):
+        return {
+            'brand_id': self.brand_id,
+            'name': self.name
+        }
 
 
 class Category(db.Model):
@@ -26,6 +44,13 @@ class Category(db.Model):
     category_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
+
+    def to_dict(self):
+        return {
+            'category_id': self.category_id,
+            'name': self.name,
+            'description': self.description
+        }
 
 
 class Product(db.Model):
@@ -40,12 +65,37 @@ class Product(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     image_url = db.Column(db.Text)
 
+    brand = db.relationship('Brand', backref=db.backref('products', lazy=True))
+    category = db.relationship('Category', backref=db.backref('products', lazy=True))
+    characteristics = db.relationship('ProductCharacteristic', backref='product', lazy=True)
+
+    def to_dict(self):
+        return {
+            'product_id': self.product_id,
+            'price': str(self.price),  # Преобразование Decimal в строку для JSON
+            'discount_price': str(self.discount_price) if self.discount_price else None,
+            'rating': str(self.rating) if self.rating else None,
+            'brand': self.brand.to_dict() if self.brand else None,
+            'category': self.category.to_dict() if self.category else None,
+            'name': self.name,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'image_url': self.image_url,
+            'characteristics': [char.to_dict() for char in self.characteristics]
+        }
+
 
 class CharacteristicTemplate(db.Model):
     __tablename__ = 'characteristic_templates'
     template_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     unit_type = db.Column(db.String(50))
+
+    def to_dict(self):
+        return {
+            'template_id': self.template_id,
+            'name': self.name,
+            'unit_type': self.unit_type
+        }
 
 
 class ProductCharacteristic(db.Model):
@@ -54,6 +104,16 @@ class ProductCharacteristic(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('products.product_id'))
     template_id = db.Column(db.Integer, db.ForeignKey('characteristic_templates.template_id'))
     value = db.Column(db.Text, nullable=False)
+
+    template = db.relationship('CharacteristicTemplate', backref=db.backref('characteristics', lazy=True))
+
+    def to_dict(self):
+        return {
+            'characteristic_id': self.characteristic_id,
+            'product_id': self.product_id,
+            'template': self.template.to_dict() if self.template else None,
+            'value': self.value
+        }
 
 
 class Order(db.Model):
@@ -65,6 +125,16 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     shipping_address = db.Column(db.Text)
 
+    def to_dict(self):
+        return {
+            'order_id': self.order_id,
+            'user_id': self.user_id,
+            'total_amount': str(self.total_amount),
+            'status': self.status,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'shipping_address': self.shipping_address
+        }
+
 
 class OrderItem(db.Model):
     __tablename__ = 'order_items'
@@ -73,11 +143,25 @@ class OrderItem(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('products.product_id'))
     quantity = db.Column(db.Integer, nullable=False)
 
+    def to_dict(self):
+        return {
+            'order_item_id': self.order_item_id,
+            'order_id': self.order_id,
+            'product_id': self.product_id,
+            'quantity': self.quantity
+        }
+
 
 class Cart(db.Model):
     __tablename__ = 'carts'
     cart_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+
+    def to_dict(self):
+        return {
+            'cart_id': self.cart_id,
+            'user_id': self.user_id
+        }
 
 
 class CartItem(db.Model):
@@ -86,6 +170,14 @@ class CartItem(db.Model):
     cart_id = db.Column(db.Integer, db.ForeignKey('carts.cart_id'))
     product_id = db.Column(db.Integer, db.ForeignKey('products.product_id'))
     quantity = db.Column(db.Integer, nullable=False)
+
+    def to_dict(self):
+        return {
+            'cart_item_id': self.cart_item_id,
+            'cart_id': self.cart_id,
+            'product_id': self.product_id,
+            'quantity': self.quantity
+        }
 
 
 class Review(db.Model):
@@ -97,6 +189,16 @@ class Review(db.Model):
     comment = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    def to_dict(self):
+        return {
+            'review_id': self.review_id,
+            'product_id': self.product_id,
+            'user_id': self.user_id,
+            'rating': self.rating,
+            'comment': self.comment,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
 
 class Admin(db.Model):
     __tablename__ = 'admins'
@@ -106,3 +208,12 @@ class Admin(db.Model):
     first_name = db.Column(db.String(50))
     last_name = db.Column(db.String(50))
     email = db.Column(db.String(100), unique=True, nullable=False)
+
+    def to_dict(self):
+        return {
+            'admin_id': self.admin_id,
+            'username': self.username,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email
+        }
