@@ -67,7 +67,7 @@ class Product(db.Model):
 
     brand = db.relationship('Brand', backref=db.backref('products', lazy=True))
     category = db.relationship('Category', backref=db.backref('products', lazy=True))
-    characteristics = db.relationship('ProductCharacteristic', backref='product', lazy=True)
+    characteristics = db.relationship('ProductCharacteristic', back_populates='product', cascade='all, delete-orphan', lazy=True)
 
     def to_dict(self):
         return {
@@ -105,6 +105,7 @@ class ProductCharacteristic(db.Model):
     template_id = db.Column(db.Integer, db.ForeignKey('characteristic_templates.template_id'))
     value = db.Column(db.Text, nullable=False)
 
+    product = db.relationship('Product', back_populates='characteristics')
     template = db.relationship('CharacteristicTemplate', backref=db.backref('characteristics', lazy=True))
 
     def to_dict(self):

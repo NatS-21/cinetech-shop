@@ -5,7 +5,7 @@
          class="toggle-icon" width="24px" height="24px">
   </div>
   <div *ngIf="isOpen" class="content">
-    <app-search-field [(searchTerm)]="searchQuery" placeholder="Search"></app-search-field>
+    <app-search-field [(searchTerm)]="searchQuery" placeholder="Найти"></app-search-field>
     <div class="category-list">
       <app-category-check-box *ngFor="let category of filteredCategories"
                               [label]="category.label"

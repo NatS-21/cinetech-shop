@@ -25,19 +25,18 @@ import {StoreService} from "../../services/store/store.service";
 export class ProductDetailsPageComponent {
   product: any = null;
 
-  constructor(protected apiService: ApiService, private route: ActivatedRoute, private store: StoreService) {
-  }
+  constructor(
+    private apiService: ApiService,
+    private route: ActivatedRoute,
+    private store: StoreService
+  ) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       const productId = Number(params.get('id'));
       if (productId) {
         this.apiService.getProductById(productId).subscribe(data => {
-          let fixedImages = []
-          for (const image of data.images) {
-            fixedImages.push(this.apiService.getImage(image));
-          }
-          data.images = fixedImages;
+          console.log(data);
           this.product = data;
         });
       }
@@ -45,14 +44,37 @@ export class ProductDetailsPageComponent {
   }
 
   getCharacteristicValue(characteristic: any): string {
-    return characteristic.unit_type === 'значение' ? characteristic.value : `${characteristic.value} ${characteristic.unit_type}`;
+    const unitType = characteristic.template.unit_type;
+    const formatted = this.formattedValue(characteristic.value)
+    return unitType === 'значение'
+      ? formatted
+      : `${formatted} ${unitType}`;
+  }
+
+  formattedValue(value: any): string {
+    const num = parseFloat(value);
+
+    if (!isNaN(num)) {
+      const decimalPart = num % 1;
+      if (decimalPart !== 0) {
+        return num.toFixed(1);
+      } else {
+        return num.toFixed(0);
+      }
+    } else {
+      return value;
+    }
   }
 
   addToWishList() {
-    this.store.addToFavorites(this.product)
+    this.store.addToFavorites(this.product);
   }
 
   addToCart() {
-    this.store.addToCart(this.product)
+    this.store.addToCart(this.product);
+  }
+
+  formatPrice(price: number): string {
+    return Math.floor(price).toLocaleString('ru-RU', {useGrouping: true});
   }
 }

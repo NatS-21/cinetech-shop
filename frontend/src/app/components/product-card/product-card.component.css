@@ -1,7 +1,7 @@
 .product-card {
-  border-radius: 9px;
+  border-radius: 16px;
   background-color: var(--color-light-primary);
-  padding: 24px 16px;
+  padding: 12px;
   position: relative;
   text-align: center;
   box-sizing: border-box;
@@ -26,7 +26,7 @@
 .favorite-container {
   display: flex;
   justify-content: right;
-  width: 100%;
+  margin-right: 8px;
 }
 
 .favorite img {
@@ -49,7 +49,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  /*height: 100%;*/
 }
 
 .product-info h3 {
@@ -65,18 +64,15 @@
 }
 
 .buy-button {
-  width: 100%;
+  flex: 1;
   box-sizing: border-box;
+  padding: 0;
 }
 
-@media (min-width: 768px) {
-  .buy-button {
-    padding: 0 16px;
-  }
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
-@media (max-width: 767px) {
-  .buy-button {
-    padding: 0;
-  }
-}

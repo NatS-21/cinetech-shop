@@ -1,8 +1,11 @@
+import random
+
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-from werkzeug.security import generate_password_hash, check_password_hash
+from bcrypt import hashpw, gensalt, checkpw
 
-from .models import db, User, Product, Cart, CartItem, Order, OrderItem, Admin
+from .models import db, User, Product, Cart, CartItem, Order, OrderItem, Admin, ProductCharacteristic, Category, \
+    CharacteristicTemplate, Brand
 
 bp = Blueprint('main', __name__)
 jwt = JWTManager()
@@ -10,17 +13,17 @@ jwt = JWTManager()
 
 @bp.route('/')
 def index():
-    return jsonify({"message": "Welcome to CineTech Store API!"})
+    return jsonify({"message": ""})
 
 
 @bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    hashed_password = generate_password_hash(data['password'], method='sha256')
+    hashed_password = hashpw(data['password'].encode('utf-8'), gensalt())
     new_user = User(
         username=data['username'],
         email=data['email'],
-        password=hashed_password,
+        password=hashed_password.decode('utf-8'),
         first_name=data.get('first_name'),
         last_name=data.get('last_name'),
         phone_number=data.get('phone_number'),
@@ -35,7 +38,7 @@ def register():
 def login():
     data = request.get_json()
     user = User.query.filter_by(username=data['username']).first()
-    if not user or not check_password_hash(user.password, data['password']):
+    if not user or not checkpw(data['password'].encode('utf-8'), user.password.encode('utf-8')):
         return jsonify({"message": "Invalid username or password"}), 401
     access_token = create_access_token(identity=user.user_id)
     return jsonify({"access_token": access_token}), 200
@@ -45,35 +48,80 @@ def login():
 def admin_login():
     data = request.get_json()
     admin = Admin.query.filter_by(username=data['username']).first()
-    if not admin or not check_password_hash(admin.password, data['password']):
+    if not admin or not checkpw(data['password'].encode('utf-8'), admin.password.encode('utf-8')):
         return jsonify({"message": "Invalid username or password"}), 401
-    access_token = create_access_token(identity=admin.admin_id)
+    access_token = create_access_token(identity={'id': admin.admin_id, 'role': 'admin'})
     return jsonify({"access_token": access_token}), 200
 
 
 @bp.route('/products', methods=['POST'])
-@jwt_required()
 def add_product():
-    identity = get_jwt_identity()
-    admin = Admin.query.get(identity)
-    if not admin:
-        return jsonify({"message": "Admin access required"}), 403
+
     data = request.get_json()
+
     product = Product(
         name=data['name'],
         price=data['price'],
         discount_price=data.get('discount_price'),
         brand_id=data['brand_id'],
         category_id=data['category_id'],
-        created_at=data.get('created_at'),
         image_url=data.get('image_url')
     )
     db.session.add(product)
+    db.session.flush()
+
+    characteristics = data.get('characteristics', [])
+    for char in characteristics:
+        product_char = ProductCharacteristic(
+            product_id=product.product_id,
+            template_id=char['template_id'],
+            value=char['value']
+        )
+        db.session.add(product_char)
+
     db.session.commit()
     return jsonify(product.to_dict()), 201
 
 
-@bp.route('/categories/<int:category_id>/products', methods=['GET'])
+@bp.route('/products/<int:product_id>', methods=['PUT'])
+def update_product(product_id):
+    product = Product.query.get_or_404(product_id)
+    data = request.get_json()
+
+    product.name = data.get('name', product.name)
+    product.price = data.get('price', product.price)
+    product.discount_price = data.get('discount_price', product.discount_price)
+    product.brand_id = data.get('brand_id', product.brand_id)
+    product.category_id = data.get('category_id', product.category_id)
+    product.image_url = data.get('image_url', product.image_url)
+
+    ProductCharacteristic.query.filter_by(product_id=product_id).delete()
+
+    characteristics = data.get('characteristics', [])
+    for char in characteristics:
+        product_char = ProductCharacteristic(
+            product_id=product_id,
+            template_id=char['template_id'],
+            value=char['value']
+        )
+        db.session.add(product_char)
+
+    db.session.commit()
+    return jsonify(product.to_dict()), 200
+
+
+@bp.route('/products/<int:product_id>', methods=['DELETE'])
+def delete_product(product_id):
+    product = Product.query.get_or_404(product_id)
+
+    ProductCharacteristic.query.filter_by(product_id=product_id).delete()
+
+    db.session.delete(product)
+    db.session.commit()
+    return jsonify({"message": "Product deleted successfully"}), 200
+
+
+@bp.route('/categories/<int:category_id>', methods=['GET'])
 def get_products_by_category(category_id):
     products = Product.query.filter_by(category_id=category_id).all()
     return jsonify([product.to_dict() for product in products])
@@ -145,3 +193,46 @@ def create_order():
         db.session.delete(item)
     db.session.commit()
     return jsonify(new_order.to_dict()), 201
+
+
+@bp.route('/search/products', methods=['GET'])
+def search_products():
+    query = request.args.get('q', '')
+    if not query:
+        return jsonify([])
+
+    products = Product.query.filter(Product.name.ilike(f'%{query}%')).limit(10).all()
+    products_data = [product.to_dict() for product in products]
+    return jsonify(products_data), 200
+
+
+@bp.route('/random-products', methods=['GET'])
+def get_random_products():
+    limit = int(request.args.get('limit', 10))
+    all_products = Product.query.all()
+    random_products = random.sample(all_products, min(len(all_products), limit))
+    return jsonify([product.to_dict() for product in random_products])
+
+
+@bp.route('/products/', methods=['GET'])
+def get_all_products():
+    products = Product.query.all()
+    return jsonify([product.to_dict() for product in products]), 200
+
+
+@bp.route('/brands', methods=['GET'])
+def get_all_brands():
+    brands = Brand.query.all()
+    return jsonify([brand.to_dict() for brand in brands]), 200
+
+
+@bp.route('/categories', methods=['GET'])
+def get_all_categories():
+    categories = Category.query.all()
+    return jsonify([category.to_dict() for category in categories]), 200
+
+
+@bp.route('/characteristic-templates', methods=['GET'])
+def get_all_characteristic_templates():
+    templates = CharacteristicTemplate.query.all()
+    return jsonify([template.to_dict() for template in templates]), 200

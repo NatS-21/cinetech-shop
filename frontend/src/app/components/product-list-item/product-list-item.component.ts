@@ -12,20 +12,20 @@ import {IconComponent} from "../icon/icon.component";
     IconComponent
   ],
   templateUrl: './product-list-item.component.html',
-  styleUrl: './product-list-item.component.css'
+  styleUrls: ['./product-list-item.component.css']
 })
 export class ProductListItemComponent {
   @Input() product: any;
   isFavorite: boolean = false;
 
-  constructor(private router: Router, private store: StoreService) {
-  }
+  constructor(private router: Router, private store: StoreService) {}
 
   ngOnInit() {
-    this.isFavorite = this.store.isFavorite(this.product.id);
+    this.isFavorite = this.store.isFavorite(this.product.product_id);
   }
 
-  toggleFavorite() {
+  toggleFavorite(event: Event) {
+    event.stopPropagation();
     this.isFavorite = !this.isFavorite;
     if (this.isFavorite) {
       this.store.addToFavorites(this.product);
@@ -35,6 +35,10 @@ export class ProductListItemComponent {
   }
 
   buyProduct() {
-    this.router.navigate([`product/${this.product.id}`]);
+    this.router.navigate([`product/${this.product.product_id}`]);
+  }
+
+  formatPrice(price: number): string {
+    return Math.floor(price).toLocaleString('ru-RU', { useGrouping: true });
   }
 }

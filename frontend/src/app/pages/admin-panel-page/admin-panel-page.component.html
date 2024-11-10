@@ -1,0 +1,128 @@
+<div class="admin-panel">
+  <app-button buttonType="button" class="sidebar-toggle" [fullWidth]="true" (action)="isSidebarOpen = !isSidebarOpen"
+              type="secondary-dark">Товары
+  </app-button>
+  <div class="sidebar" [class.open]="isSidebarOpen || !isMobile">
+    <app-button *ngIf="isMobile" class="close-button" buttonType="button" [fullWidth]="true"
+                (action)="isSidebarOpen = false" type="secondary-dark">Закрыть
+    </app-button>
+    <app-button buttonType="button" class="logout-button" [fullWidth]="true" (action)="logout()"
+                type="secondary-dark">Выйти
+    </app-button>
+    <app-button buttonType="button" class="add-button" [fullWidth]="true" (action)="addNewProduct()"
+                type="secondary-dark">Добавить
+    </app-button>
+
+    <ul>
+      <li
+        *ngFor="let product of products"
+        [class.selected]="selectedProduct?.product_id === product.product_id"
+        (click)="selectProduct(product)"
+      >
+        <img [src]="product.image_url" alt="{{ product.name }}"/>
+        <span>{{ product.name }}</span>
+      </li>
+    </ul>
+  </div>
+  <div class="main-content">
+    <div class="form-container" *ngIf="isAddingNewProduct || selectedProduct">
+      <form (ngSubmit)="saveProduct()">
+        <div class="form-sections">
+          <div class="product-info">
+            <h2>Информация о товаре</h2>
+            <app-input-field
+              label="Название"
+              [(ngModel)]="name"
+              name="name"
+              required
+            ></app-input-field>
+
+            <app-dropdown
+              [options]="brands"
+              placeholder="Бренд"
+              [(ngModel)]="brandId"
+              name="brandId"
+              optionLabel="name"
+              optionValue="brand_id"
+              required
+            ></app-dropdown>
+
+            <app-dropdown
+              [options]="categories"
+              placeholder="Категория"
+              [(ngModel)]="categoryId"
+              name="categoryId"
+              optionLabel="name"
+              optionValue="category_id"
+              required
+            ></app-dropdown>
+
+            <app-input-field
+              label="Img URL"
+              [(ngModel)]="imageUrl"
+              name="imageUrl"
+            ></app-input-field>
+
+            <app-input-field
+              label="Цена"
+              type="number"
+              [(ngModel)]="price"
+              name="price"
+              required
+            ></app-input-field>
+
+            <app-input-field
+              label="Цена со скидкой"
+              type="number"
+              [(ngModel)]="discountPrice"
+              name="discountPrice"
+            ></app-input-field>
+          </div>
+
+          <div class="characteristics">
+            <h2>Характеристики</h2>
+            <app-button buttonType="button" (action)="addCharacteristic()" type="secondary-dark">Добавить
+              характеристику
+            </app-button>
+            <div *ngFor="let char of characteristics; index as i" class="characteristic-item">
+              <app-dropdown
+                [options]="templates"
+                placeholder="Template"
+                [(ngModel)]="char.template_id"
+                [ngModelOptions]="{ standalone: true }"
+                optionLabel="name"
+                optionValue="template_id"
+                required
+              ></app-dropdown>
+              <app-input-field
+                label="Значение"
+                [(ngModel)]="char.value"
+                [ngModelOptions]="{ standalone: true }"
+                required
+              ></app-input-field>
+              <app-button buttonType="button" [fullWidth]="true" (action)="removeCharacteristic(i)"
+                          type="secondary-dark">Удалить
+              </app-button>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <app-button type="primary" size="large" buttonType="submit">
+            {{ isAddingNewProduct ? 'Сохранить' : 'Обновить' }}
+          </app-button>
+          <app-button
+            *ngIf="!isAddingNewProduct"
+            type="secondary-dark"
+            size="large"
+            (action)="deleteProduct()"
+          >
+            Удалить
+          </app-button>
+        </div>
+      </form>
+    </div>
+    <div *ngIf="!isAddingNewProduct && !selectedProduct">
+      <p>Выберите товар для редактирования или добавьте новый.</p>
+    </div>
+  </div>
+</div>

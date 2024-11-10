@@ -1,1 +1,8 @@
 Flask~=3.0.3
+Werkzeug~=3.0.3
+pandas~=2.2.2
+requests~=2.32.3
+beautifulsoup4~=4.12.3
+numpy~=2.0.1
+alembic~=1.13.2
+SQLAlchemy~=2.0.32

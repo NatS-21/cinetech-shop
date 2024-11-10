@@ -13,7 +13,7 @@ import {NgOptimizedImage} from "@angular/common";
   styleUrls: ['./search-field.component.css']
 })
 export class SearchFieldComponent {
-  @Input() placeholder: string = 'Search';
+  @Input() placeholder: string = 'Искать товары';
   @Input() searchTerm: string = '';
   @Output() searchTermChange = new EventEmitter<string>();
 

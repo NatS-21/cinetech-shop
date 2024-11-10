@@ -18,13 +18,14 @@
   height: 100%;
   aspect-ratio: 1;
   max-height: 90px;
+  max-width: 90px;
+  object-fit: contain;
 }
 
 .product-info {
   display: flex;
   flex: 1;
   flex-direction: column;
-  align-items: center;
   justify-content: space-between;
 }
 
@@ -38,4 +39,9 @@
   font-size: 1.5rem;
   font-weight: bold;
   margin: 0 0 16px 0;
+}
+
+.favorite-button {
+  width: 32px;
+  height: 32px;
 }

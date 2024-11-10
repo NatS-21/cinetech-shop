@@ -34,7 +34,7 @@ export class ShoppingCartPageComponent {
   }
 
   calculateSubtotal() {
-    this.subtotal = this.cartItems.reduce((acc, item) => acc + item.price, 0);
+    this.subtotal = this.cartItems.reduce((acc, item) => acc + parseFloat(item.price), 0);
   }
 
   getTotal() {
@@ -46,5 +46,9 @@ export class ShoppingCartPageComponent {
 
   checkout() {
     this.store.clearCart()
+  }
+
+  formatPrice(price: number): string {
+    return Math.floor(price).toLocaleString('ru-RU', { useGrouping: true });
   }
 }

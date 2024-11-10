@@ -40,15 +40,19 @@ export class HeaderComponent {
   onSearchTermChange(newTerm: string) {
     this.searchTerm = newTerm;
     if (this.searchTerm.length > 0) {
-      this.apiService.getAllProducts().subscribe(products => {
-        this.searchResults = products
-          .filter(product => product.name.toLowerCase().includes(this.searchTerm.toLowerCase()))
-          .slice(0, 10);
+      this.apiService.searchProducts(this.searchTerm).subscribe(products => {
+        this.searchResults = products;
         this.showDropdown = this.searchResults.length > 0;
       });
     } else {
       this.showDropdown = false;
       this.searchResults = [];
     }
+  }
+
+  navigateToProduct(productId: number) {
+    this.router.navigate(['/product', productId]);
+    this.showDropdown = false;
+    this.searchTerm = '';
   }
 }

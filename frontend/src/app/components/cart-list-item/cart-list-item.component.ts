@@ -19,14 +19,18 @@ export class CartListItemComponent {
   }
 
   removeFromCart() {
-    this.store.removeFromCart(this.product.id);
+    this.store.removeFromCart(this.product.product_id);
   }
 
   increaseQuantity() {
-    this.store.increaseQuantity(this.product.id);
+    this.store.increaseQuantity(this.product.product_id);
   }
 
   decreaseQuantity() {
-    this.store.decreaseQuantity(this.product.id);
+    this.store.decreaseQuantity(this.product.product_id);
+  }
+
+  formatPrice(price: number): string {
+    return Math.floor(price).toLocaleString('ru-RU', { useGrouping: true });
   }
 }

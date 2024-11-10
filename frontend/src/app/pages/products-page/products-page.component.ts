@@ -39,7 +39,7 @@ export class ProductsPageComponent implements OnInit {
   currentPage: number = 1;
   totalPages: number = 1;
   itemsPerPage: number = 9;
-  sortOptions: string[] = ['By rating', 'By Delivery Date', 'By price'];
+  sortOptions: string[] = ['Популярные', 'Быстрая доставка', 'Подешевле'];
   selectedSortOption: string | null = null;
 
   constructor(private apiService: ApiService, private route: ActivatedRoute) {
@@ -67,25 +67,32 @@ export class ProductsPageComponent implements OnInit {
     this.filteredProducts = this.products.filter(product => {
       return Object.keys(this.selectedFilters).every(key => {
         if (this.selectedFilters[key].length === 0) return true;
-        return this.selectedFilters[key].some((filter: string) =>
-          product.characteristics.some((char: any) => {
-            let charWithType = char.unit_type === 'значение' ? char.value : `${char.value} ${char.unit_type}`;
-            return char.characteristic === key && charWithType === filter;
-          })
-        );
+
+        return this.selectedFilters[key].some((filter: string) => this.matchesFilter(product, key, filter));
       });
     });
+
     this.applySorting();
     this.totalPages = Math.ceil(this.filteredProducts.length / this.itemsPerPage);
     this.paginate();
   }
 
+  private matchesFilter(product: any, key: string, filter: string): boolean {
+    return product.characteristics.some((char: any) => {
+      const charName = char.template.name;
+      const unitType = char.template.unit_type;
+      const charWithType = unitType === 'значение' ? char.value : `${char.value} ${unitType}`;
+
+      return charName === key && charWithType === filter;
+    });
+  }
+
   applySorting() {
-    if (this.selectedSortOption === 'By rating') {
+    if (this.selectedSortOption === 'Популярные') {
       this.filteredProducts.sort((a, b) => b.rating - a.rating);
-    } else if (this.selectedSortOption === 'By Delivery Date') {
+    } else if (this.selectedSortOption === 'Быстрая доставка') {
       this.filteredProducts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    } else if (this.selectedSortOption === 'By price') {
+    } else if (this.selectedSortOption === 'Подешевле') {
       this.filteredProducts.sort((a, b) => a.price - b.price);
     }
   }

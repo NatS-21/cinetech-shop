@@ -16,8 +16,7 @@ import {NgForOf} from "@angular/common";
 export class FavoritesPagesComponent {
   favorites: any[] = [];
 
-  constructor(private store: StoreService) {
-  }
+  constructor(private store: StoreService) {}
 
   ngOnInit() {
     this.store.favorites$.subscribe(favorites => {

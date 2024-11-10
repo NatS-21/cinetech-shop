@@ -1,4 +1,4 @@
 <div class="category-card secondary" (click)="handleClick()">
-  <app-icon [iconName]="iconName" [size]="48"></app-icon>
+  <img [src]="getImageUrl(imageName)" [alt]="label">
   <div class="label">{{ label }}</div>
 </div>

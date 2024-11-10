@@ -23,7 +23,7 @@ button:hover {
 }
 
 button.active {
-  background-color: var(--color-dark-primary);
+  background-color: var(--color-accent-primary);
   color: var(--color-light-primary);
 }
 

@@ -49,20 +49,33 @@ export class FilterSectionComponent implements OnChanges {
       }
     });
 
-    return Object.keys(categoryCountMap).map(label => ({
+    const structuredCategories = Object.keys(categoryCountMap).map(label => ({
       label,
       count: categoryCountMap[label],
       selected: false
     }));
+
+    // Сортировка по label
+    structuredCategories.sort((a, b) => {
+      const aNum = parseFloat(a.label);
+      const bNum = parseFloat(b.label);
+
+      if (!isNaN(aNum) && !isNaN(bNum)) {
+        return aNum - bNum;
+      } else {
+        return a.label.localeCompare(b.label, 'ru', { numeric: true });
+      }
+    });
+
+    return structuredCategories;
   }
 
   get filteredCategories() {
     if (!this.structuredCategories) {
       return [];
     }
-    const filtered = this.structuredCategories.filter(category =>
+    return this.structuredCategories.filter(category =>
       category.label && category.label.toLowerCase().includes(this.searchQuery.toLowerCase()));
-    return filtered.length > 0 ? filtered : this.structuredCategories;
   }
 
   onCategoryToggle(categoryLabel: string) {
@@ -73,7 +86,7 @@ export class FilterSectionComponent implements OnChanges {
       const selectedCategories = this.structuredCategories
         .filter(c => c.selected)
         .map(c => c.label);
-      this.filterChange.emit({key: this.title, value: selectedCategories});
+      this.filterChange.emit({ key: this.title, value: selectedCategories });
     }
   }
 }

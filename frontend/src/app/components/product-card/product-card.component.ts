@@ -19,7 +19,7 @@ export class ProductCardComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.isFavorite = this.store.isFavorite(this.product.id);
+    this.isFavorite = this.store.isFavorite(this.product.product_id);
   }
 
   toggleFavorite() {
@@ -32,6 +32,10 @@ export class ProductCardComponent implements OnInit {
   }
 
   buyProduct() {
-    this.router.navigate([`product/${this.product.id}`]);
+    this.router.navigate([`product/${this.product.product_id}`]);
+  }
+
+  formatPrice(price: number): string {
+    return Math.floor(price).toLocaleString('ru-RU', {useGrouping: true});
   }
 }

@@ -21,10 +21,7 @@ import {Observable} from "rxjs";
   styleUrl: './home-page.component.css'
 })
 export class HomePageComponent implements OnInit {
-  newArrivals: any[] = [];
-  bestsellers: any[] = [];
-  featuredProducts: any[] = [];
-  selectedProducts: any[] = [];
+  products: any[] = [];
 
   constructor(private apiService: ApiService, private router: Router) {
   }
@@ -34,29 +31,12 @@ export class HomePageComponent implements OnInit {
   }
 
   loadProducts() {
-    this.apiService.getAllProducts().subscribe(products => {
-      this.newArrivals = products.slice(0, 8);
-      this.bestsellers = products.slice(8, 16);
-      this.featuredProducts = products.slice(16, 24);
-      this.openProductsTab(0)
+    this.apiService.getRandomProducts(32).subscribe(products => {
+      this.products = products;
     });
   }
 
-  openProduct(productId: number): void {
-    this.router.navigate([`product/${productId}`]);
-  }
-
-  openProductsTab(tabId: number): void {
-    switch (tabId) {
-      case 0:
-        this.selectedProducts = this.newArrivals
-        break
-      case 1:
-        this.selectedProducts = this.bestsellers
-        break
-      case 2:
-        this.selectedProducts = this.featuredProducts
-        break
-    }
+  openCategory(categoryId: number) {
+    this.router.navigate([`category/${categoryId}`]);
   }
 }

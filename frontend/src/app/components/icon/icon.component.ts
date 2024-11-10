@@ -6,13 +6,11 @@ import {Component, Input, numberAttribute, OnInit} from '@angular/core';
   standalone: true,
   styleUrls: ['./icon.component.css']
 })
-export class IconComponent implements OnInit {
+export class IconComponent {
   @Input() iconName: string = '';
-  @Input({transform: numberAttribute}) size: number = 24;
+  @Input({ transform: numberAttribute }) size: number = 24;
 
-  iconPath: string = '';
-
-  ngOnInit(): void {
-    this.iconPath = `assets/icons/${this.iconName}.svg`;
+  get iconPath(): string {
+    return `assets/icons/${this.iconName}.svg`;
   }
 }

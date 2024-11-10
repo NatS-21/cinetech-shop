@@ -16,7 +16,7 @@
         Selected Products: <span class="count">{{ filteredProducts.length }}</span>
       </div>
       <div class="sort-dropdown">
-        <app-dropdown [options]="sortOptions" placeholder="By rating" (optionSelected)="onSortChange($event)"></app-dropdown>
+        <app-dropdown [options]="sortOptions" placeholder="Популярные" (optionSelected)="onSortChange($event)"></app-dropdown>
       </div>
     </div>
     <div class="selected-products secondary mobile-only">

@@ -13,4 +13,19 @@ export class DetailCardComponent {
   @Input() iconName: string = '';
   @Input() title: string = '';
   @Input() value: string = '';
+
+  get formattedValue(): string {
+    const num = parseFloat(this.value);
+
+    if (!isNaN(num)) {
+      const decimalPart = num % 1;
+      if (decimalPart !== 0) {
+        return num.toFixed(1);
+      } else {
+        return num.toFixed(0);
+      }
+    } else {
+      return this.value;
+    }
+  }
 }

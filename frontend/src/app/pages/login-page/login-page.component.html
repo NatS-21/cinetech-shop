@@ -1,0 +1,20 @@
+<div class="login-page">
+  <h1>Авторизация</h1>
+  <form (ngSubmit)="login()">
+    <app-input-field
+      label="Имя пользователя"
+      placeholder="Введите имя пользователя"
+      [(ngModel)]="username"
+      name="username"
+    ></app-input-field>
+    <app-input-field
+      label="Пароль"
+      placeholder="Введите пароль"
+      isSecure="true"
+      [(ngModel)]="password"
+      name="password"
+    ></app-input-field>
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+    <app-button type="primary" size="large" [fullWidth]="true" buttonType="submit">Войти</app-button>
+  </form>
+</div>

@@ -16,6 +16,21 @@ export class CategoryCheckBoxComponent {
   @Input() count: number = 0;
   @Output() action = new EventEmitter<void>();
 
+  get formattedLabel(): string {
+    const num = parseFloat(this.label);
+
+    if (!isNaN(num)) {
+      const decimalPart = num % 1;
+      if (decimalPart !== 0) {
+        return num.toFixed(1);
+      } else {
+        return num.toFixed(0);
+      }
+    } else {
+      return this.label;
+    }
+  }
+
   toggle() {
     this.checked = !this.checked;
     this.action.emit()
